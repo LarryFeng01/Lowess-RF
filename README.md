@@ -2,14 +2,14 @@
 
 ## Introduction
 
-In this project I will be presenting the concepts of Locally Weighted Regression and Random Forest Regression. I will explain the theory behhind the regression methods and then apply them to the "Cars.csv" data set where only on input and one output variable is considered. For both methods, the final crossvalidated mean square errors are reported to compare which method achieves better results.
+In this project I will be presenting the concepts of Locally Weighted Regression and Random Forest Regression. I will explain the theory behind the regression methods and then apply them to the "Cars.csv" data set where only on input and one output variable is considered. For both methods, the final crossvalidated mean square errors are reported to compare which method achieves better results.
 
 ## Theory
 
 ### Locally Weighted Regression
-Model-based methods use data to buld a parameterized model. And after training the model, it is used for predictions and the data are generally discarded. But, memory-based methods are non-parametric in that they keep the training data and use it any time a prediction is made. Locally weighted regression (lowess) is a memory-based method and performs a regression using the local training data around the point of interest.
+Model-based methods use data to build a parameterized model. And after training the model, it is used for predictions and the data are generally discarded. But, memory-based methods are non-parametric in that they keep the training data and use it any time a prediction is made. Locally weighted regression (lowess) is a memory-based method and performs a regression using the local training data around the point of interest.
 
-Using a kernel, data points are weighted by proximity to the current x location. Then, a regression is computed using the weighted points. 
+Using a kernel, data points are weighted by proximity to the current *x* location. Then, a regression is computed using the weighted points. 
 
 In class, we compare the mathematical concept of lowess compared to linear regression. The main idea of linear regression is
 ![render](https://user-images.githubusercontent.com/58920498/153341904-aeef19e6-153d-4158-bb1d-c322d315beae.png)
@@ -34,9 +34,10 @@ Now we solve for y:
 These are the predictions that we make with linear regression. But with locally weighted regression, our equation is:
 ![render](https://user-images.githubusercontent.com/58920498/153644163-484fddb6-1494-4eb8-af4c-0fc21a4ea438.png)
 
-So, the predictions we make are actually a linear combination of the actual observed values of the dependent variable. And for lowess. y hat is obtained as a different linear combination of the values of y.
+So, the predictions we make from our univariate data are a linear combination of the actual observed values of the dependent variable. And for lowess, y-hat is obtained as a different linear combination of the values of y.
+
 ### Random Forest Regression
-Random Forest is a variable of supervised learning algorithm that uses ensemble methods for regression (and also classification). It begins by constructing many decision trees with the training data and outputs the mean prediction of individual trees. Within the random forest, there isn't interaction between the individual trees so the trees prevent each other from individual errors. So, the forest acts as an estimator algorithm that aggregates the result of many trees and then outputs the optimal result.
+Random Forest (RF) is a variable of supervised learning algorithm that uses ensemble methods for regression (and also classification). It begins by constructing many decision trees with the training data and outputs the mean prediction of individual trees. Within the random forest, there isn't interaction between the individual trees so the trees prevent each other from individual errors. So, the forest acts as an estimator algorithm that aggregates the result of many trees and then outputs the optimal result.
 
 Since Random Forest is an ensemble technique that can do classificaion and regression, we call the techniques RF uses Bootstrap and Aggregation, which is also known as "bagging". This technique combines multiple decision trees in determining the final output, which was discussed above. 
 
@@ -45,15 +46,15 @@ To start the using Random Forest, we follow the steps to a normal machine learni
 2) Create a machine learning model
 3) Set the baseline model that you want to achieve
 4) Train the data to the model
-5) Compare the performace of the test data to the predicted data
+5) Compare the performance of the test data to the predicted data
 6) Change parameters around until you are satisfied with the model
 7) Interpret the results and report accordingly
 
 ## Modeling Approach
 
-Let's import some data. We will be using the '*cars*' dataset; to import run the `pd.read_csv()` command. 
+Let's import some data. We will be using the '*Cars.csv*' dataset; to import run the `pd.read_csv()` command. 
 Running our output will give us a table of our data:
-- | MPG | CYL | ENG | WGT
+--- | MPG | CYL | ENG | WGT
 --- | --- | --- | --- |--- 
 0 | 18.0 | 8 | 307.0 | 3504
 1 | 15.0 | 8 | 350.0 | 3693
@@ -81,7 +82,7 @@ Since we are modeling for univariate observations, our *x* will be the weight of
     f = interp1d(x, yest,fill_value='extrapolate')
     return f(xnew)
 ```
-The above function is doing exactly what was described in the theory section where we calcuate the weights given the data. Now, we will split the data into train/test splits and standardize the data. We must also be careful about the shape of the data while standardizing and transforming. 
+The above function is doing exactly what was described in the theory section where we calculate the weights given the data. Now, we will split the data into train/test splits and standardize the data. We must also be careful about the shape of the data while standardizing and transforming. 
 ```
 xtrain, xtest, ytrain, ytest = tts(x,y,test_size=0.25, random_state=123)
 scale = StandardScaler()
@@ -93,6 +94,14 @@ Lastly, we will use the function to get predictions for *y* and compare them wit
 yhat_test = lowess_reg(xtrain_scaled.ravel(),ytrain,xtest_scaled,tricubic,0.1)
 mse(yhat_test,ytest)
 ```
+We can also visualize the algorithm by making a scatterplot of the data and adding the predicted lines on top. 
+```
+Q = np.column_stack([xtest_scaled,yhat_test])
+Q = Q[np.argsort(Q[:,0])]
+plt.scatter(xtest_scaled,ytest,color='blue', alpha=0.5)
+plt.plot(Q[:,0],Q[:,1], color='red', lw=2)
+```
+![render](https://user-images.githubusercontent.com/58920498/153676341-36aff249-8e62-4be9-ba99-b17cb3a86de1.png)
 
 ### Random Forest
 Random Forest requires fewer lines to run:
@@ -101,7 +110,16 @@ rf = RandomForestRegressor(n_estimators=100,max_depth=3)
 rf.fit(xtrain_scaled,ytrain)
 mse(ytest,rf.predict(xtest_scaled))
 ```
-However, we can also write all of the above code for both algorithms into one or two blocks to make it concise, and this time we will add in crossvalidation. 
+Let's make a plot for this too.
+```
+M = np.column_stack([xtest_scaled,yhat_rf])
+M = M[np.argsort(M[:,0])]
+plt.scatter(xtest_scaled,ytest,color='blue', alpha=0.5)
+plt.plot(M[:,0],M[:,1], color='red', lw=2)
+```
+![render](https://user-images.githubusercontent.com/58920498/153676813-51b3f395-4ce1-4533-902b-90d9fd034b01.png)
+
+However, we can also write all of the above code for both algorithms into one or two blocks to make it concise, and this time we will add in cross validation. 
 ```
 kf = KFold(n_splits=10,shuffle=True,random_state=410)
 mse_lwr = []
@@ -123,7 +141,7 @@ for idxtrain,idxtest in kf.split(x):
 print('The MSE for RF is :' + str(np.mean(mse_rf)))
 print('The MSE for locally weighted reg is :' + str(np.mean(mse_lwr)))
 ```
-The last two lines will print the result of the mean squared error, which is what we base our results on. The lower error is better, so in our case Lowess is the better model with a crossvalidated MSE of 17.765 compared to 17.922 of RF. 
+The last two lines will print the result of the mean squared error, which is what we base our results on. The lower error is better, so in our case Lowess is the better model with a cross validated MSE of 17.765 compared to 17.922 of RF.
 
 ## Conclusion
-Although there are times when changing the hyperparameters for RF will lead to a lower MSE, changing a hyperparamter in lowess in response can lead to an even lower MSE. Over a couple experiments, lowess consistenly had the lower MSE when changing aroud hyperparameters. In conclusion, for the "Cars.csv" data set, my results indicate that lowess returns a lower crossvalidated mean squared error compared to random forest; therefore, lowess is a better algorithm for our purposes.
+Although there are times when changing the hyperparameters for RF will lead to a lower MSE, changing a hyperparamter in lowess in response can lead to an even lower MSE. Over a couple experiments, lowess consistently had the lower MSE when changing aroud hyperparameters. In conclusion, for the "Cars.csv" data set, my results indicate that lowess returns a lower cross validated mean squared error compared to random forest; therefore, lowess is a better algorithm for our purposes.
