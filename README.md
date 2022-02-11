@@ -54,15 +54,8 @@ To start the using Random Forest, we follow the steps to a normal machine learni
 
 Let's import some data. We will be using the '*Cars.csv*' dataset; to import run the `pd.read_csv()` command. 
 Running our output will give us a table of our data:
-<i></i> | MPG  | CYL | ENG   | WGT
-------- | ---- | --- | ----- | ----
-0       | 18.0 | 8   | 307.0 | 3504
-1       | 15.0 | 8   | 350.0 | 3693
-2       | 18.0 | 8   | 318.0 | 3436
-...     | ...  | ... | ...   | ...
-389     | 32.0 | 4   | 135.0 | 2295
-390     | 28.0 | 4   | 120.0 | 2625
-391     | 31.0 | 4   | 119.0 | 2720
+
+![image](https://user-images.githubusercontent.com/58920498/153681371-cd9b49a0-c971-4b1d-bc9a-af6f91885511.png)
 
 Since we are modeling for univariate observations, our *x* will be the weight of the car ('*WGT*'), and our *y* will be the miles per gallon ('*MPG*'). 
 
