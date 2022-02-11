@@ -1,4 +1,4 @@
-# Locally Weighted Regression and Random Forest
+# Locally Weighted Regression and Random Forest Project
 
 ## Introduction
 
@@ -53,9 +53,17 @@ To start the using Random Forest, we follow the steps to a normal machine learni
 
 Let's import some data. We will be using the '*cars*' dataset; to import run the `pd.read_csv()` command. 
 Running our output will give us a table of our data:
--- data --
+- | MPG | CYL | ENG | WGT
+--- | --- | --- | --- |--- 
+0 | 18.0 | 8 | 307.0 | 3504
+1 | 15.0 | 8 | 350.0 | 3693
+2 | 18.0 | 8 | 318.0 | 3436
+... | ... | ... | ... | ...
+389 | 32.0 | 4 | 135.0 | 2295
+390 | 28.0 | 4 | 120.0 | 2625
+391 | 31.0 | 4 | 119.0 | 2720
 
-Since we are modeling for univariate observations, our *x* will be the weight of the car, and our *y* will be the miles per gallon. 
+Since we are modeling for univariate observations, our *x* will be the weight of the car ('*WGT*'), and our *y* will be the miles per gallon ('*MPG*'). 
 
 ### Locally Weighted Regression
 ```
@@ -118,3 +126,4 @@ print('The MSE for locally weighted reg is :' + str(np.mean(mse_lwr)))
 The last two lines will print the result of the mean squared error, which is what we base our results on. The lower error is better, so in our case Lowess is the better model with a crossvalidated MSE of 17.765 compared to 17.922 of RF. 
 
 ## Conclusion
+Although there are times when changing the hyperparameters for RF will lead to a lower MSE, changing a hyperparamter in lowess in response can lead to an even lower MSE. Over a couple experiments, lowess consistenly had the lower MSE when changing aroud hyperparameters. In conclusion, for the "Cars.csv" data set, my results indicate that lowess returns a lower crossvalidated mean squared error compared to random forest; therefore, lowess is a better algorithm for our purposes.
