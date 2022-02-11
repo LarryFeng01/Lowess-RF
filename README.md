@@ -50,3 +50,62 @@ To start the using Random Forest, we follow the steps to a normal machine learni
 7) Interpret the results and report accordingly
 8) 
 ## Modeling Approach
+
+### Locally Weighted Regression
+```
+  def lowess_reg(x, y, xnew, kern, tau):
+    n = len(x)
+    yest = np.zeros(n)  
+    w = np.array([kern((x - x[i])/(2*tau)) for i in range(n)])     
+    for i in range(n):
+        weights = w[:, i]
+        b = np.array([np.sum(weights * y), np.sum(weights * y * x)])
+        A = np.array([[np.sum(weights), np.sum(weights * x)],
+                    [np.sum(weights * x), np.sum(weights * x * x)]])
+        theta, res, rnk, s = linalg.lstsq(A, b)
+        yest[i] = theta[0] + theta[1] * x[i] 
+    f = interp1d(x, yest,fill_value='extrapolate')
+    return f(xnew)
+```
+The above function is doing exactly what was described in the theory section where we calcuate the weights given the data. Now, we will split the data into train/test splits and standardize the data. We must also be careful about the shape of the data while standardizing and transforming. 
+```
+xtrain, xtest, ytrain, ytest = tts(x,y,test_size=0.25, random_state=123)
+scale = StandardScaler()
+xtrain_scaled = scale.fit_transform(xtrain.reshape(-1,1))
+xtest_scaled = scale.transform(xtest.reshape(-1,1))
+```
+Lastly, we will use the function to get predictions for *y* and compare them with our data.
+```
+yhat_test = lowess_reg(xtrain_scaled.ravel(),ytrain,xtest_scaled,tricubic,0.1)
+mse(yhat_test,ytest)
+```
+
+### Random Forest
+Random Forest requires fewer lines to run:
+```
+rf = RandomForestRegressor(n_estimators=100,max_depth=3)
+rf.fit(xtrain_scaled,ytrain)
+mse(ytest,rf.predict(xtest_scaled))
+```
+However, we can also write all of this code into one or two blocks to make it concise, and this time we will add in crossvalidation. 
+```
+kf = KFold(n_splits=10,shuffle=True,random_state=410)
+mse_lwr = []
+mse_rf = []
+rf = RandomForestRegressor(n_estimators=100,max_depth=3, random_state=410)
+kf = KFold(n_splits=10,shuffle=True,random_state=410)
+for idxtrain,idxtest in kf.split(x):
+  ytrain = y[idxtrain]
+  xtrain = x[idxtrain]
+  xtrain = scale.fit_transform(xtrain.reshape(-1,1))
+  ytest = y[idxtest]
+  xtest = x[idxtest]
+  xtest = scale.transform(xtest.reshape(-1,1))
+  yhat_lwr = lowess_reg(xtrain.ravel(),ytrain,xtest.ravel(),tricubic,0.4)
+  rf.fit(xtrain,ytrain)
+  yhat_rf = rf.predict(xtest)
+  mse_lwr.append(mse(ytest,yhat_lwr))
+  mse_rf.append(mse(ytest,yhat_rf))
+print('The MSE for RF is :' + str(np.mean(mse_rf)))
+print('The MSE for locally weighted reg is :' + str(np.mean(mse_lwr)))
+```
