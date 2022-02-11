@@ -54,7 +54,7 @@ To start the using Random Forest, we follow the steps to a normal machine learni
 
 Let's import some data. We will be using the '*Cars.csv*' dataset; to import run the `pd.read_csv()` command. 
 Running our output will give us a table of our data:
---- | MPG | CYL | ENG | WGT
+<i></i> | MPG | CYL | ENG | WGT
 --- | --- | --- | --- |--- 
 0 | 18.0 | 8 | 307.0 | 3504
 1 | 15.0 | 8 | 350.0 | 3693
