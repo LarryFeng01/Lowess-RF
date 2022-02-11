@@ -48,8 +48,14 @@ To start the using Random Forest, we follow the steps to a normal machine learni
 5) Compare the performace of the test data to the predicted data
 6) Change parameters around until you are satisfied with the model
 7) Interpret the results and report accordingly
-8) 
+
 ## Modeling Approach
+
+Let's import some data. We will be using the '*cars*' dataset; to import run the `pd.read_csv()` command. 
+Running our output will give us a table of our data:
+-- data --
+
+Since we are modeling for univariate observations, our *x* will be the weight of the car, and our *y* will be the miles per gallon. 
 
 ### Locally Weighted Regression
 ```
@@ -87,7 +93,7 @@ rf = RandomForestRegressor(n_estimators=100,max_depth=3)
 rf.fit(xtrain_scaled,ytrain)
 mse(ytest,rf.predict(xtest_scaled))
 ```
-However, we can also write all of this code into one or two blocks to make it concise, and this time we will add in crossvalidation. 
+However, we can also write all of the above code for both algorithms into one or two blocks to make it concise, and this time we will add in crossvalidation. 
 ```
 kf = KFold(n_splits=10,shuffle=True,random_state=410)
 mse_lwr = []
@@ -109,3 +115,6 @@ for idxtrain,idxtest in kf.split(x):
 print('The MSE for RF is :' + str(np.mean(mse_rf)))
 print('The MSE for locally weighted reg is :' + str(np.mean(mse_lwr)))
 ```
+The last two lines will print the result of the mean squared error, which is what we base our results on. The lower error is better, so in our case Lowess is the better model with a crossvalidated MSE of 17.765 compared to 17.922 of RF. 
+
+## Conclusion
